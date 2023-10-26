@@ -23,6 +23,7 @@ var (
 	procSQLEndTran         = mododbc32.NewProc("SQLEndTran")
 	procSQLExecute         = mododbc32.NewProc("SQLExecute")
 	procSQLFetch           = mododbc32.NewProc("SQLFetch")
+	procSQLFetchScroll     = mododbc32.NewProc("SQLFetchScroll")
 	procSQLFreeHandle      = mododbc32.NewProc("SQLFreeHandle")
 	procSQLGetData         = mododbc32.NewProc("SQLGetData")
 	procSQLGetDiagRecW     = mododbc32.NewProc("SQLGetDiagRecW")
@@ -36,6 +37,8 @@ var (
 	procSQLColAttribute    = mododbc32.NewProc("SQLColAttribute")
 	procSQLMoreResults     = mododbc32.NewProc("SQLMoreResults")
 	procSQLSetStmtAttrW    = mododbc32.NewProc("SQLSetStmtAttrW")
+	procSQLSetPos	       = mododbc32.NewProc("SQLSetPos")
+	procSQLBulkOperations  = mododbc32.NewProc("SQLBulkOperations")
 	procSQLCreateDb        = mododbc32.NewProc("SQLCreateDbW")
 	procSQLDropDb          = mododbc32.NewProc("SQLDropDbW")
 )
@@ -114,6 +117,12 @@ func SQLFetch(statementHandle SQLHSTMT) (ret SQLRETURN) {
 	return
 }
 
+func SQLFetchScroll(statementHandle SQLHSTMT, fetchOrientation SQLUSMALLINT, fetchOffset SQLLEN) (ret SQLRETURN) {
+	r0, _, _ := syscall.Syscall(procSQLFetch.Addr(), 3, uintptr(statementHandle), uintptr(fetchOrientation), uintptr(fetchOffset))
+	ret = SQLRETURN(r0)
+	return
+}
+
 func SQLFreeHandle(handleType SQLSMALLINT, handle SQLHANDLE) (ret SQLRETURN) {
 	r0, _, _ := syscall.Syscall(procSQLFreeHandle.Addr(), 2, uintptr(handleType), uintptr(handle), 0)
 	ret = SQLRETURN(r0)
@@ -182,6 +191,18 @@ func SQLMoreResults(statementHandle SQLHSTMT) (ret SQLRETURN) {
 
 func SQLSetStmtAttr(statementHandle SQLHSTMT, attribute SQLINTEGER, valuePtr SQLPOINTER, stringLength SQLINTEGER) (ret SQLRETURN) {
 	r0, _, _ := syscall.Syscall6(procSQLSetStmtAttrW.Addr(), 4, uintptr(statementHandle), uintptr(attribute), uintptr(valuePtr), uintptr(stringLength), 0, 0)
+	ret = SQLRETURN(r0)
+	return
+}
+
+func SQLSetPos(statementHandle SQLHSTMT, rowNumber SQLSETPOSIROW, operation SQLUSMALLINT, lockType SQLUSMALLINT) (ret SQLRETURN) {
+	r0, _, _ := syscall.Syscall6(procSQLSetPos.Addr(), 4, uintptr(statementHandle), uintptr(rowNumber), uintptr(operation), uintptr(lockType), 0, 0)
+	ret = SQLRETURN(r0)
+	return
+}
+
+func SQLBulkOperations(statementHandle SQLHSTMT, operation SQLSMALLINT) (ret SQLRETURN) {
+	r0, _, _ := syscall.Syscall6(procSQLBulkOperations.Addr(), 2, uintptr(statementHandle), uintptr(operation), 0, 0, 0, 0)
 	ret = SQLRETURN(r0)
 	return
 }
