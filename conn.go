@@ -80,7 +80,7 @@ func (c *Conn) Query(query string, args []driver.Value) (driver.Rows, error) {
 		return nil, NewError("SQLSetStmtAttr", h)
 	}
 
-	/*  Number of rows fetched during FETCHSCROLL will be stored in numrowsfetchedptr */
+	/*  Number of rows fetched during SQLFetchScroll will be stored in numrowsfetchedptr */
 	var numrowsfetchedptr uint64
 	ret1 = api.SQLSetStmtAttr(h,api.SQL_ATTR_ROWS_FETCHED_PTR,
 		(api.SQLPOINTER)(unsafe.Pointer(&numrowsfetchedptr)),api.SQL_IS_INTEGER)
