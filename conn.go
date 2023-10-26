@@ -59,6 +59,44 @@ func (c *Conn) Query(query string, args []driver.Value) (driver.Rows, error) {
 		return nil, NewError("SQLAllocHandle", c.h)
 	}
 	h := api.SQLHSTMT(out)
+
+	//	Edited Code  
+	
+	// number of rows to fetch using SQLFetchScroll
+	nR := 1
+	
+	/*  Set the number of rows fetched during SQLFetchScroll */
+	ret1 := api.SQLSetStmtAttr(h,api.SQL_ATTR_ROW_ARRAY_SIZE,
+		(api.SQLPOINTER)(nR),api.SQL_IS_INTEGER)
+	if IsError(ret1) {
+		return nil, NewError("SQLSetStmtAttr", h)
+	}
+
+	/*  Set the cursor type to Dynamic cursor */
+	ret1 = api.SQLSetStmtAttr(h,api.SQL_ATTR_CURSOR_TYPE,
+		//(api.SQLPOINTER)(api.SQL_CURSOR_DYNAMIC),api.SQL_IS_INTEGER)
+		api.SQL_CURSOR_DYNAMIC,api.SQL_IS_INTEGER)
+	if IsError(ret1) {
+		return nil, NewError("SQLSetStmtAttr", h)
+	}
+
+	/*  Number of rows fetched during FETCHSCROLL will be stored in numrowsfetchedptr */
+	var numrowsfetchedptr uint64
+	ret1 = api.SQLSetStmtAttr(h,api.SQL_ATTR_ROWS_FETCHED_PTR,
+		(api.SQLPOINTER)(unsafe.Pointer(&numrowsfetchedptr)),api.SQL_IS_INTEGER)
+		//(api.SQLPOINTER)(numrowsfetchedptr),api.SQL_IS_INTEGER)
+	if IsError(ret1) {
+		return nil, NewError("SQLSetStmtAttr", h)
+	}
+
+	/* Setting b1 as the row status pointer */
+	var b1 = make([]byte,nR)
+	ret1 = api.SQLSetStmtAttr(h,api.SQL_ATTR_ROW_STATUS_PTR,
+		(api.SQLPOINTER)(unsafe.Pointer(&b1[0])),api.SQL_IS_INTEGER)
+	if IsError(ret1) {
+		return nil, NewError("SQLSetStmtAttr", h)
+	}
+	
 	drv.Stats.updateHandleCount(api.SQL_HANDLE_STMT, 1)
 	b := api.StringToUTF16(query)
 	ret = api.SQLExecDirect(h,
@@ -79,6 +117,12 @@ func (c *Conn) Query(query string, args []driver.Value) (driver.Rows, error) {
 	err = os.BindColumns()
 	if err != nil {
 		return nil, err
+	}
+	if (true) {
+		ret1 = api.SQLSetPos(h, 1, api.SQL_UPDATE, api.SQL_LOCK_NO_CHANGE);
+		if IsError(ret1) {
+			return nil, NewError("SQLSetPos", h)
+		}
 	}
 	return &Rows{os: os}, nil
 }
