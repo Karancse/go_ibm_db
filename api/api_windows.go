@@ -37,7 +37,7 @@ var (
 	procSQLColAttribute    = mododbc32.NewProc("SQLColAttribute")
 	procSQLMoreResults     = mododbc32.NewProc("SQLMoreResults")
 	procSQLSetStmtAttrW    = mododbc32.NewProc("SQLSetStmtAttrW")
-	procSQLSetPos		   = mododbc32.NewProc("SQLSetPos")
+	procSQLSetPos	       = mododbc32.NewProc("SQLSetPos")
 	procSQLBulkOperations  = mododbc32.NewProc("SQLBulkOperations")
 	procSQLCreateDb        = mododbc32.NewProc("SQLCreateDbW")
 	procSQLDropDb          = mododbc32.NewProc("SQLDropDbW")
