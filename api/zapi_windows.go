@@ -36,7 +36,9 @@ var (
 	procSQLSetConnectAttrW = mododbc32.NewProc("SQLSetConnectAttrW")
 	procSQLColAttribute    = mododbc32.NewProc("SQLColAttribute")
 	procSQLMoreResults     = mododbc32.NewProc("SQLMoreResults")
+	procSQLSetStmtAttr     = mododbc32.NewProc("SQLSetStmtAttr")
 	procSQLSetStmtAttrW    = mododbc32.NewProc("SQLSetStmtAttrW")
+	procSQLGetStmtAttr     = mododbc32.NewProc("SQLGetStmtAttr")
 	procSQLSetPos	       = mododbc32.NewProc("SQLSetPos")
 	procSQLBulkOperations  = mododbc32.NewProc("SQLBulkOperations")
 	procSQLCreateDb        = mododbc32.NewProc("SQLCreateDbW")
@@ -190,7 +192,13 @@ func SQLMoreResults(statementHandle SQLHSTMT) (ret SQLRETURN) {
 }
 
 func SQLSetStmtAttr(statementHandle SQLHSTMT, attribute SQLINTEGER, valuePtr SQLPOINTER, stringLength SQLINTEGER) (ret SQLRETURN) {
-	r0, _, _ := syscall.Syscall6(procSQLSetStmtAttrW.Addr(), 4, uintptr(statementHandle), uintptr(attribute), uintptr(valuePtr), uintptr(stringLength), 0, 0)
+	r0, _, _ := syscall.Syscall6(procSQLSetStmtAttr.Addr(), 4, uintptr(statementHandle), uintptr(attribute), uintptr(valuePtr), uintptr(stringLength), 0, 0)
+	ret = SQLRETURN(r0)
+	return
+}
+
+func SQLGetStmtAttr(environmentHandle SQLHSTMT, attribute SQLINTEGER, targetValuePtr []byte, stringLength SQLINTEGER) (ret SQLRETURN) {
+	r0, _, _ := syscall.Syscall6(procSQLGetStmtAttr.Addr(), 4, uintptr(environmentHandle), uintptr(attribute), uintptr(unsafe.Pointer(&targetValuePtr[0])), uintptr(stringLength), 0, 0)
 	ret = SQLRETURN(r0)
 	return
 }
