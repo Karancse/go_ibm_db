@@ -143,16 +143,6 @@ func (c *Conn) Query(query string, args []driver.Value) (driver.Rows, error) {	i
 		if IsError(ret) {
 			return nil, NewError("SQLFetch", h)
 		}
-	} else {
-		/* SQLFetchScroll works only for nR or SQL_ATTR_ROW_ARRAY_SIZE = 1.
-			Otherwise not working at (*rows r).Scan() */
-		ret = api.SQLFetchScroll(h,api.SQL_FETCH_FIRST,0)
-		if ret == api.SQL_NO_DATA {
-			return nil, NewError("SQLFetchScroll", h)
-		}
-		if IsError(ret) {
-			return nil, NewError("SQLFetchScroll", h)
-		}
 	}
 
 	fmt.Println("(api.SQLPOINTER)(unsafe.Pointer(&numrowsfetched)) = ",(api.SQLPOINTER)(unsafe.Pointer(&numrowsfetched)))
@@ -164,8 +154,8 @@ func (c *Conn) Query(query string, args []driver.Value) (driver.Rows, error) {	i
 	}
 	fmt.Println("os.Cols[0].Value(os.h, 0) = ",v)
 
-	if (false) {
-		/* SQLSetPos is updating for row 1. 
+	if (true) {
+		/* SQLSetPos is updating the first row. 
 			But it is not working because cursor type is not set to dynamic */
 		ret = api.SQLSetPos(h, 1, api.SQL_UPDATE, api.SQL_LOCK_NO_CHANGE);
 		if IsError(ret) {
