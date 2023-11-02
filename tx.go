@@ -8,7 +8,7 @@ import (
 	"database/sql/driver"
 	"errors"
 
-	"github.com/ibmdb/go_ibm_db/api"
+	"github.com/Karancse/go_ibm_db_fork/api"
 )
 
 type Tx struct {
